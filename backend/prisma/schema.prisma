@@ -1,0 +1,77 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider   = "prisma-client-js"
+  output     = "./generated/client"
+  engineType = "binary"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum TransactionType {
+  Register
+  Login
+}
+
+model Employee {
+  id        String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  username  String             @unique
+  fullName  String
+  password  String
+  isAdmin   Boolean            @default(false)
+  isActive  Boolean            @default(true)
+  joinAt    DateTime           @default(now())
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @default(now()) @updatedAt
+  unitRoles EmployeeUnitRole[]
+  authLog   AuthLog[]
+}
+
+model Unit {
+  id          String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String             @unique
+  description String?
+  isActive    Boolean            @default(true)
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @default(now()) @updatedAt
+  unitRoles   EmployeeUnitRole[]
+}
+
+model Role {
+  id          String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String             @unique
+  description String?
+  isActive    Boolean            @default(true)
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @default(now()) @updatedAt
+  unitRoles   EmployeeUnitRole[]
+}
+
+model EmployeeUnitRole {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  employee   Employee @relation(fields: [employeeId], references: [id])
+  employeeId String   @unique @db.Uuid
+  unit       Unit     @relation(fields: [unitId], references: [id])
+  unitId     String   @unique @db.Uuid
+  role       Role     @relation(fields: [roleId], references: [id])
+  roleId     String   @unique @db.Uuid
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now()) @updatedAt
+}
+
+model AuthLog {
+  id          String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  employee    Employee?       @relation(fields: [employeeId], references: [id])
+  employeeId  String?         @unique @db.Uuid
+  transaction TransactionType
+  isSucceed   Boolean         @default(true)
+  authAt      DateTime        @default(now())
+}

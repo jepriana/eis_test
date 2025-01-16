@@ -1,0 +1,60 @@
+{
+  "name": "puri-bunda-backend",
+  "version": "1.0.0",
+  "description": "A backend project for an employee information system was developed for the Software Engineer test at Puri Bunda",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint 'src/**/*.ts'",
+    "start": "node dist/app.ts",
+    "dev": "nodemon --watch src --exec ts-node src/app.ts",
+    "seed": "ts-node prisma/seed.ts",
+    "swagger-autogen": "node swagger.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jepriana/eis_puri_bunda.git"
+  },
+  "keywords": [
+    "employee",
+    "information",
+    "system"
+  ],
+  "author": "I Wayan Jepriana",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jepriana/eis_puri_bunda/issues"
+  },
+  "homepage": "https://github.com/jepriana/eis_puri_bunda#readme",
+  "dependencies": {
+    "@prisma/client": "^6.2.1",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "http-status-codes": "^2.3.0",
+    "jsonwebtoken": "^9.0.2",
+    "pg": "^8.13.1",
+    "prisma": "^6.2.1",
+    "swagger-ui-express": "^5.0.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.18.0",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
+    "@types/http-status-codes": "^1.2.0",
+    "@types/jsonwebtoken": "^9.0.7",
+    "@types/node": "^22.10.7",
+    "@types/swagger-ui-express": "^4.1.7",
+    "@typescript-eslint/eslint-plugin": "^8.20.0",
+    "@typescript-eslint/parser": "^8.20.0",
+    "eslint": "^9.18.0",
+    "globals": "^15.14.0",
+    "nodemon": "^3.1.9",
+    "swagger-autogen": "^2.23.7",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.3",
+    "typescript-eslint": "^8.20.0"
+  }
+}
