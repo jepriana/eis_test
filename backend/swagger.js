@@ -10,8 +10,8 @@ const routes = [
 
 const doc = {
     info: {
-      title: 'SIADE API',
-      description: 'Sistem Informasi Administrasi Desa API'
+      title: 'EIS Puri Bunda API',
+      description: 'Sistem Informasi Kepegawaian Puri Bunda'
     },
     host: 'localhost:3000'
   };

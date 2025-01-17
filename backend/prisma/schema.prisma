@@ -57,11 +57,11 @@ model Role {
 model EmployeeUnitRole {
   id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   employee   Employee @relation(fields: [employeeId], references: [id])
-  employeeId String   @unique @db.Uuid
+  employeeId String   @db.Uuid
   unit       Unit     @relation(fields: [unitId], references: [id])
-  unitId     String   @unique @db.Uuid
+  unitId     String   @db.Uuid
   role       Role     @relation(fields: [roleId], references: [id])
-  roleId     String   @unique @db.Uuid
+  roleId     String   @db.Uuid
   isActive   Boolean  @default(true)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @default(now()) @updatedAt

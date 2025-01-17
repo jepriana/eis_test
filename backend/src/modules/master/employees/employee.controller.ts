@@ -34,12 +34,17 @@ export async function createEmployee(req: Request, res: Response) {
             );
         }
 
+        let joinDate = new Date();
+        if (joinAt) {
+            joinDate = new Date(joinAt);
+        }
+
         const newEmployee: NewEmployee = {
             username: username,
             fullName: fullName,
             isAdmin: false,
             password: bcrypt.hashSync(password, 8),
-            joinAt: joinAt ?? new Date(),
+            joinAt: joinDate,
         };
 
         // Saving employee into database
@@ -138,14 +143,16 @@ export async function updateEmployee(req: Request, res: Response) {
             if (!fullName) {
                 return requestErrorResponse(res, 'Employee full name can not be empty!');
             }
-            if (!password) {
-                return requestErrorResponse(res, 'Employee password can not be empty!');
+
+            let joinDate = new Date();
+            if (joinAt) {
+                joinDate = new Date(joinAt);
             }
             const updatedEmployee = await repository.updateEmployee(employeeId, {
                 username,
                 fullName,
                 isAdmin: isAdmin ?? result.isAdmin,
-                joinAt: joinAt ?? result.joinAt,
+                joinAt: joinDate,
                 password: password != null ? bcrypt.hashSync(password, 8) : result.password
             });
             if (updatedEmployee) {
