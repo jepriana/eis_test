@@ -10,7 +10,7 @@ interface EmployeeFormProps {
   fetchEmployees: () => void;
 }
 
-const EmployeeForm: React.FC<EmployeeFormProps> = ({ open, onClose, initialData, fetchEmployees }) => {
+const EmployeeEntry: React.FC<EmployeeFormProps> = ({ open, onClose, initialData, fetchEmployees }) => {
   const [username, setUsername] = useState(initialData?.username || '');
   const [fullName, setFullName] = useState(initialData?.fullName || '');
   const [password, setPassword] = useState('');
@@ -82,7 +82,7 @@ const EmployeeForm: React.FC<EmployeeFormProps> = ({ open, onClose, initialData,
           <TextField
             label="Join Date"
             type="date"
-            value={new Date(joinAt)}
+            value={joinAt}
             onChange={(e) => setJoinAt(e.target.value)}
             fullWidth
             margin="normal"
@@ -104,4 +104,4 @@ const EmployeeForm: React.FC<EmployeeFormProps> = ({ open, onClose, initialData,
   );
 };
 
-export default EmployeeForm;
+export default EmployeeEntry;

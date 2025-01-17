@@ -7,7 +7,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import AuthProvider, { AuthContext } from './context/AuthContext';
 import Sidebar from './components/common/Sidebar';
 import Login from './components/common/Login';
-import EmployeeList from './components/employee/EmployeeList';
+import Employees from './components/employee/Employees';
 import Dashboard from './components/common/Dashboard';
 import Units from './components/unit/Units';
 import Roles from './components/role/Roles';
@@ -93,7 +93,7 @@ const AppContent: React.FC = () => {
           />
           <Route path="/login" element={<Login />} />
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/employees" element={<EmployeeList />} />
+          <Route path="/employees" element={<Employees />} />
           <Route path="/units" element={<Units />} />
           <Route path="/roles" element={<Roles />} />
         </Routes>
