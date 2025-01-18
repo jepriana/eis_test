@@ -290,7 +290,7 @@ export async function getEmployeeByUsername(username: string): Promise<EmployeeD
     }
 }
 
-export async function count(keyword: string | undefined): Promise<number> {
+export async function countEmployee(keyword: string | undefined): Promise<number> {
     try {
         const conditions = {
             isActive: true,

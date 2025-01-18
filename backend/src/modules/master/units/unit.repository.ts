@@ -104,7 +104,7 @@ export async function getUnitByName(name: string): Promise<Unit | null> {
     });
 }
 
-export async function count(keyword: string | undefined): Promise<number> {
+export async function countUnit(keyword: string | undefined): Promise<number> {
     const conditions = keyword === undefined ? {
         isActive: true
     } : {
