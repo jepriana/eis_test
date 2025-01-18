@@ -26,15 +26,32 @@ The backend is developed using:
 3. **Set up environment variables:**
     Create a `.env` file in the `backend` directory with the following content:
     ```env
-    DATABASE_URL=postgresql://<username>:<password>@<host>:<port>/<database>
+    DATABASE_URL="postgresql://<username>:<password>@<host>:<port>/<database>"
+    DATABASE_URL        = "postgresql://neondb_owner:1oLpQPhKjWF4@ep-flat-water-a1nx8ifj.ap-southeast-1.aws.neon.tech/puri_bunda?sslmode=require"
+    ACCESS_TOKEN_KEY    = "<YOUR ACCESS TOKEN KEY>
+    REFRESH_TOKEN_KEY   = "<YOUR REFRESH TOKEN KEY>
+    ACCESS_TOKEN_AGE    = 8400
+    REFRESH_TOKEN_AGE   = 2592000
+    PORT                = 3001
+    SECRET_CODE         = R4h4514
     ```
+
+    - Database URL for Testing: postgresql://neondb_owner:1oLpQPhKjWF4@ep-flat-water-a1nx8ifj.ap-southeast-1.aws.neon.tech/puri_bunda?sslmode=require
+    - Access Token for Testing: 1S2K3YRChcxkRTvT3DFyWu6UpSThQVOFaQN9VhfWurSvcuyJlPte1rEFmVNA8OJY3QJ0_OcgRAWvEhTncCln_w
+    - Refresh Token for Testing: 1S2K3YRChcxkRTvT3DFyWu6UpSThQVOFaQN9VhfWurSvcuyJlPte1rEFmVNA8OJY3QJ0_OcgRAWvEhTncCln_w
+    Notes: Secret code is a code that can be used for admin employee creation.
 
 4. **Run database migrations:**
     ```sh
     npx prisma migrate dev
     ```
 
-5. **Start the backend server:**
+5. **Generate prisma client code:**
+    ```sh
+    npx prisma generate
+    ```
+
+6. **Start the backend server:**
     ```sh
     npm run dev
     ```
@@ -42,6 +59,7 @@ The backend is developed using:
 ## Frontend
 
 The frontend is developed using:
+- TypeScript
 - React
 - Material Design
 
