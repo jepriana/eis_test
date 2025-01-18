@@ -4,10 +4,16 @@ export interface TopLoginItem {
     totalLogin: number,
 }
 
+export interface TrendItem {
+    month: string,
+    totalLogins: number,
+}
+
 export interface DashboardSummary {
     totalEmployee: number,
     totalLogin: number, 
     totalUnit: number,
     totalRole: number,
     topLogin: TopLoginItem[],
+    loginTrend: TrendItem[],
 }

@@ -95,22 +95,13 @@ const Employees: React.FC = () => {
     setDeleteConfirm({ open: false, employeeId: null });
   };
 
+  
   return (
     <Container>
       <Box sx={{ my: 4 }}>
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Typography variant="h4">Employee List</Typography>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() => setOpenForm(true)}
-          >
+          <Button variant="contained" color="primary" onClick={() => setOpenForm(true)}>
             Add Employee
           </Button>
         </Box>
@@ -129,10 +120,10 @@ const Employees: React.FC = () => {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>Username</TableCell>
-              <TableCell>Full Name</TableCell>
-              <TableCell>Join Date</TableCell>
-              <TableCell>Actions</TableCell>
+              <TableCell sx={{ fontWeight: 'bold', backgroundColor: '#f5f5f5' }}>Username</TableCell>
+              <TableCell sx={{ fontWeight: 'bold', backgroundColor: '#f5f5f5' }}>Full Name</TableCell>
+              <TableCell sx={{ fontWeight: 'bold', backgroundColor: '#f5f5f5' }}>Join Date</TableCell>
+              <TableCell sx={{ fontWeight: 'bold', backgroundColor: '#f5f5f5' }}>Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -155,7 +146,7 @@ const Employees: React.FC = () => {
         </Table>
         <TablePagination
           component="div"
-          count={totalRecords} // Update with actual total count from API
+          count={totalRecords}
           page={page}
           onPageChange={handleChangePage}
           rowsPerPage={rowsPerPage}

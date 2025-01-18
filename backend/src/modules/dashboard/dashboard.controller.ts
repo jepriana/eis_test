@@ -9,14 +9,14 @@ import {
 
 export async function getDashboardSummary(req: Request, res: Response) {
     try {
-        const { startDate, endDate } = req.params;
-        if (!startDate || new Date(startDate).toString() === 'Invalid Date') {
+        const { startDate, endDate } = req.query;
+        if (!startDate || new Date(startDate.toString()).toString() === 'Invalid Date') {
             return requestErrorResponse(res, 'Start Date can not be empty and should be in YYYY-MM-DD format!');
         }
-        if (!endDate || new Date(endDate).toString() === 'Invalid Date') {
+        if (!endDate || new Date(endDate.toString()).toString() === 'Invalid Date') {
             return requestErrorResponse(res, 'End Date can not be empty and should be in YYYY-MM-DD format!');
         }
-        const summary = await repository.getDashboardSummary(new Date(startDate), new Date(endDate));
+        const summary = await repository.getDashboardSummary(new Date(startDate.toString()), new Date(endDate.toString()));
         if (summary) {
             return okResponse(res, summary);
         }

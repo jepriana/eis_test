@@ -2,10 +2,11 @@ import prisma from "../../configs/prisma.config";
 import { countUnit } from "../master/units/unit.repository";
 import { countRole } from "../master/roles/role.repository";
 import {
-  DashboardSummary,
+    DashboardSummary,
 } from "./dashboard.interface";
+import { format, parseISO } from "date-fns";
 
-export async function getDashboardSummary(startDate: Date, endDate: Date): Promise<DashboardSummary> {  
+export async function getDashboardSummary(startDate: Date, endDate: Date): Promise<DashboardSummary> {
     const totalUnit = await countUnit(undefined);
     const totalRole = await countRole(undefined);
     const totalEmployee = await prisma.employee.count({
@@ -37,12 +38,12 @@ export async function getDashboardSummary(startDate: Date, endDate: Date): Promi
         _count: {
             employeeId: true,
         },
-        orderBy: { 
-            _count: { 
-                employeeId: 'desc', 
-            }, 
-        }, 
-        take: 10, 
+        orderBy: {
+            _count: {
+                employeeId: 'desc',
+            },
+        },
+        take: 10,
     });
 
     const topLogin = await Promise.all(
@@ -59,12 +60,38 @@ export async function getDashboardSummary(startDate: Date, endDate: Date): Promi
             }
         })
     );
-  
+
+    const authLogs = await prisma.authLog.findMany({
+        select: {
+            authAt: true
+        },
+        where: {
+            authAt: {
+                gte: startDate,
+                lte: endDate
+            },
+        },
+        orderBy: {
+            authAt: 'asc',
+        },
+    });
+
+    const trend = authLogs.reduce((acc, log) => { 
+        const month = format(parseISO(log.authAt.toISOString()), 'yyyy-MM'); 
+        if (!acc[month]) { 
+            acc[month] = 0; 
+        } 
+        acc[month]++; 
+        return acc; 
+    }, {} as Record<string, number>); 
+    const loginTrend = Object.entries(trend).map(([month, totalLogins]) => ({ month, totalLogins, })).sort((a, b) => new Date(a.month).getTime() - new Date(b.month).getTime());
+
     return {
-      totalUnit,
-      totalRole,
-      totalEmployee,
-      totalLogin,
-      topLogin,
+        totalUnit,
+        totalRole,
+        totalEmployee,
+        totalLogin,
+        topLogin,
+        loginTrend,
     };
-  }
+}

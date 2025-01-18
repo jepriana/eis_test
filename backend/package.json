@@ -40,6 +40,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.18.0",
+    "@faker-js/faker": "^9.4.0",
     "@types/bcryptjs": "^2.4.6",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
@@ -51,7 +52,6 @@
     "@typescript-eslint/parser": "^8.20.0",
     "date-fns": "^4.1.0",
     "eslint": "^9.18.0",
-    "faker": "^6.6.6",
     "globals": "^15.14.0",
     "nodemon": "^3.1.9",
     "swagger-autogen": "^2.23.7",
