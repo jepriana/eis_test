@@ -1,4 +1,4 @@
-# Puri Bunda Test Project
+# Employee Information System Project
 
 This project consists of two main parts: the backend and the frontend.
 
