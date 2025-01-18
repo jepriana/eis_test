@@ -18,6 +18,7 @@ export interface EmployeeUnitRoleDetail extends NewEmployeeUnitRole {
 }
 
 export interface UnitRoles {
+    id: string,
     unit: Unit,
     role: Role,
 }

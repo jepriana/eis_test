@@ -5,7 +5,9 @@ const routes = [
   './src/modules/master/employees/employee.routes.ts',
   './src/modules/master/units/unit.routes.ts',
   './src/modules/master/roles/role.routes.ts',
-  './src/modules/master/employee-unit-roles/employee-unit-role.routes.ts'
+  './src/modules/master/employee-unit-roles/employee-unit-role.routes.ts',
+  './src/modules/master/logs/log.routes.ts',
+  './src/modules/dashboard/dashboard.routes.ts'
 ];
 
 const doc = {
@@ -13,7 +15,7 @@ const doc = {
       title: 'EIS Puri Bunda API',
       description: 'Sistem Informasi Kepegawaian Puri Bunda'
     },
-    host: 'localhost:3000'
+    host: 'localhost:3001',
   };
   
 

@@ -70,7 +70,7 @@ model EmployeeUnitRole {
 model AuthLog {
   id          String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   employee    Employee?       @relation(fields: [employeeId], references: [id])
-  employeeId  String?         @unique @db.Uuid
+  employeeId  String          @db.Uuid
   transaction TransactionType
   isSucceed   Boolean         @default(true)
   authAt      DateTime        @default(now())
