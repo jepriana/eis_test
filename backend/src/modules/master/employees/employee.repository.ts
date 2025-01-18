@@ -59,6 +59,7 @@ export async function getAllEmployees(keyword: string | undefined): Promise<Empl
                 updatedAt: true,
                 unitRoles: {
                     select: {
+                        id: true,
                         unit: {
                             select: {
                                 id: true,
@@ -122,6 +123,7 @@ export async function getAllEmployeeWithPagination(keyword: string | undefined, 
                 updatedAt: true,
                 unitRoles: {
                     select: {
+                        id: true,
                         unit: {
                             select: {
                                 id: true,
@@ -184,6 +186,7 @@ export async function getEmployeeById(id: string): Promise<EmployeeDetail | null
                 updatedAt: true,
                 unitRoles: {
                     select: {
+                        id: true,
                         unit: {
                             select: {
                                 id: true,
@@ -226,6 +229,7 @@ export async function getEmployeeWithPasswordById(id: string): Promise<EmployeeW
                 updatedAt: true,
                 unitRoles: {
                     select: {
+                        id: true,
                         unit: {
                             select: {
                                 id: true,
@@ -267,6 +271,7 @@ export async function getEmployeeByUsername(username: string): Promise<EmployeeD
                 updatedAt: true,
                 unitRoles: {
                     select: {
+                        id: true,
                         unit: {
                             select: {
                                 id: true,

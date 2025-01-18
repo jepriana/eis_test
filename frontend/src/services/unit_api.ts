@@ -13,6 +13,13 @@ export const createUnit = (token: string, unitData: object) => {
     });
   };
   
+  export const getAllUnits = (token: string, keyword: string) => {
+    return axiosInstance.get(`/master/units`, {
+      headers: { Authorization: `Bearer ${token}` },
+      params: { keyword },
+    });
+  };
+  
   export const getUnitById = (token: string, unitId: string) => {
     return axiosInstance.get(`/master/units/${unitId}`, {
       headers: { Authorization: `Bearer ${token}` },

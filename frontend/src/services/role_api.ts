@@ -13,6 +13,13 @@ export const createRole = (token: string, roleData: object) => {
     });
   };
   
+  export const getAllRoles = (token: string, keyword: string) => {
+    return axiosInstance.get(`/master/roles/all`, {
+      headers: { Authorization: `Bearer ${token}` },
+      params: { keyword },
+    });
+  };
+  
   export const getRoleById = (token: string, roleId: string) => {
     return axiosInstance.get(`/master/roles/${roleId}`, {
       headers: { Authorization: `Bearer ${token}` },
