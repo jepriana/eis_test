@@ -5,7 +5,8 @@ const routes = [
   './src/modules/master/employees/employee.routes.ts',
   './src/modules/master/units/unit.routes.ts',
   './src/modules/master/roles/role.routes.ts',
-  './src/modules/master/employee-unit-roles/employee-unit-role.routes.ts'
+  './src/modules/master/employee-unit-roles/employee-unit-role.routes.ts',
+  './src/modules/master/logs/log.routes.ts'
 ];
 
 const doc = {

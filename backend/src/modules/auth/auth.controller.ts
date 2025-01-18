@@ -1,6 +1,7 @@
 import { Request, Response } from "express"
 import { Employee, EmployeeDetail, NewEmployee } from "../master/employees/employee.interface"
 import * as employeeRepository from "../master/employees/employee.repository"
+import { addAuthLog } from "../master/logs/log.repository"
 import bcrypt from "bcryptjs"
 import { TokenManager } from "../../utils/token-manager"
 import jwt from 'jsonwebtoken'
@@ -42,6 +43,7 @@ export async function register(req: Request, res: Response) {
         // Saving User into database
         const createdEmployee: Employee | null = await employeeRepository.addEmployee(newEmployee);
         if (createdEmployee) {
+            await addAuthLog({ employeeId: createdEmployee.id.toString(), transaction: 'Register', authAt: new Date(), isSucceed: true });
             return createdResponse(res, createdEmployee);
         }
         return internalErrorResponse(res, 'Some error occured while registering User.');
@@ -80,7 +82,7 @@ export async function login(req: Request, res: Response) {
                 const refreshToken = TokenManager.generateRefreshToken({
                     id: targetEmployee.id,
                 });
-
+                await addAuthLog({ employeeId: targetEmployee.id.toString(), transaction: 'Login', authAt: new Date(), isSucceed: true });
                 return okResponse(res, {
                     accessToken,
                     refreshToken,
