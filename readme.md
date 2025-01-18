@@ -27,7 +27,6 @@ The backend is developed using:
     Create a `.env` file in the `backend` directory with the following content:
     ```env
     DATABASE_URL="postgresql://<username>:<password>@<host>:<port>/<database>"
-    DATABASE_URL        = "postgresql://neondb_owner:1oLpQPhKjWF4@ep-flat-water-a1nx8ifj.ap-southeast-1.aws.neon.tech/puri_bunda?sslmode=require"
     ACCESS_TOKEN_KEY    = "<YOUR ACCESS TOKEN KEY>
     REFRESH_TOKEN_KEY   = "<YOUR REFRESH TOKEN KEY>
     ACCESS_TOKEN_AGE    = 8400
