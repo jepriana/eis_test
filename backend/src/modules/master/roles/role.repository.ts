@@ -104,7 +104,7 @@ export async function getRoleByName(name: string): Promise<Role | null> {
     });
 }
 
-export async function count(keyword: string | undefined): Promise<number> {
+export async function countRole(keyword: string | undefined): Promise<number> {
     const conditions = keyword === undefined ? {
         isActive: true
     } : {
