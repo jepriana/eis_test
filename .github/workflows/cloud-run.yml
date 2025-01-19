@@ -87,7 +87,7 @@ jobs:
     - name: Set up Google Cloud SDK
       uses: google-github-actions/setup-gcloud@v1
       with:
-        project_id:  ${{ secrets.s }}
+        project_id:  ${{ secrets.CLOUD_RUN_PROJECT_NAME }}
 
     - name: Enable the necessary APIs and enable docker auth
       run: |-
