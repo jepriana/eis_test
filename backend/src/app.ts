@@ -22,7 +22,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.get("/", (req, res) => {
   res.json({
-    message: 'Welcome to SIADE Web API'
+    message: 'Welcome to Puri Bunda Web API'
   });
 });
 
