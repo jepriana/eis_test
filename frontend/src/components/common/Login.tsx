@@ -2,6 +2,7 @@ import React, { useState, useContext } from 'react';
 import { Button, TextField, Container, Typography, Box, Alert } from '@mui/material';
 import { AuthContext } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import logo from '../../assets/logo.png';
 
 const Login: React.FC = () => {
   const [username, setUsername] = useState('');
@@ -25,6 +26,7 @@ const Login: React.FC = () => {
   return (
     <Container maxWidth="sm">
       <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mt: 8 }}>
+        <img src={logo} alt="Logo" style={{ width: '300px', marginBottom: '8px' }} />
         <Typography variant="h4">Login</Typography>
         {error && ( 
           <Alert severity="error" sx={{ width: '100%', mt: 2 }}> {error} </Alert> 

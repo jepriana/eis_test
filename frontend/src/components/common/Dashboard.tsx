@@ -1,9 +1,10 @@
-import React, { useEffect, useState, useContext } from 'react';
-import { Box, Typography, Card, CardContent, Container, CircularProgress } from '@mui/material';
+import React, { useEffect, useState, useContext, useCallback } from 'react';
+import { Box, Typography, Card, CardContent, Container, CircularProgress, TextField, Grid } from '@mui/material';
 import { Bar, Line } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, PointElement, LineElement } from 'chart.js';
 import { getDashboardSummary } from '../../services/dashboard_api';
 import { AuthContext } from '../../context/AuthContext';
+import dayjs, { Dayjs } from 'dayjs';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, PointElement, LineElement);
 
@@ -26,20 +27,23 @@ interface DashboardData {
 const Dashboard: React.FC = () => {
     const [data, setData] = useState<DashboardData | null>(null);
     const [loading, setLoading] = useState(true);
+    const [startDate, setStartDate] = useState<Dayjs>(dayjs(`${dayjs().year()}-01-01`));
+    const [endDate, setEndDate] = useState<Dayjs>(dayjs());
     const authContext = useContext(AuthContext);
 
-    useEffect(() => {
-        const fetchData = async () => {
-            if (authContext?.accessToken) {
-                const response = await getDashboardSummary(authContext.accessToken, '2023-01-01', '2024-12-31');  // Adjust the API endpoint as needed
-                const result = await response.data;
-                setData(result);
-              }
+    const fetchData = useCallback( async (start: string, end: string) => {
+        if (authContext?.accessToken) {
+            setLoading(true);
+            const response = await getDashboardSummary(authContext.accessToken, start, end);
+            const result = await response.data;
+            setData(result);
             setLoading(false);
-        };
-
-        fetchData();
+        }
     }, [authContext?.accessToken]);
+
+    useEffect(() => {
+        fetchData(startDate.format('YYYY-MM-DD'), endDate.format('YYYY-MM-DD'));
+    }, [authContext?.accessToken, startDate, endDate, fetchData]);
 
     if (loading) {
         return <CircularProgress />;
@@ -74,11 +78,34 @@ const Dashboard: React.FC = () => {
 
     return (
         <Container>
-            <Typography
-                variant="h4"
-                gutterBottom>
+            <Typography variant="h4" gutterBottom>
                 Dashboard
             </Typography>
+
+            {/* Date Range Filter */}
+            <Grid container spacing={2} sx={{ mb: 4 }}>
+                <Grid item xs={12} sm={6}>
+                    <TextField
+                        label="Start Date"
+                        type="date"
+                        value={startDate.format('YYYY-MM-DD')}
+                        onChange={(e) => setStartDate(dayjs(e.target.value))}
+                        fullWidth
+                        InputLabelProps={{ shrink: true }}
+                    />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                    <TextField
+                        label="End Date"
+                        type="date"
+                        value={endDate.format('YYYY-MM-DD')}
+                        onChange={(e) => setEndDate(dayjs(e.target.value))}
+                        fullWidth
+                        InputLabelProps={{ shrink: true }}
+                    />
+                </Grid>
+            </Grid>
+
             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mb: 4 }}>
                 <Card sx={{ flex: '1 1 200px' }}>
                     <CardContent>
@@ -105,17 +132,13 @@ const Dashboard: React.FC = () => {
                     </CardContent>
                 </Card>
             </Box>
-            <Typography
-                variant="h5"
-                gutterBottom>
+            <Typography variant="h5" gutterBottom>
                 Top 10 Employees by Login
             </Typography>
             <Box sx={{ mb: 4 }}>
                 <Bar data={barData} />
             </Box>
-            <Typography
-                variant="h5"
-                gutterBottom>
+            <Typography variant="h5" gutterBottom>
                 Login Trend by Month
             </Typography>
             <Box sx={{ mb: 4 }}>

@@ -22,6 +22,7 @@ import {
   updateEmployeeUnitRole,
   deleteEmployeeUnitRole,
 } from "../../services/employee_unit_role_api";
+import {formatDate} from '../../utils/date_formater';
 
 interface EmployeeFormProps {
   open: boolean;
@@ -62,15 +63,7 @@ const EmployeeEntry: React.FC<EmployeeFormProps> = ({
   const [unitOptions, setUnitOptions] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  const authContext = useContext(AuthContext);
-
-  function formatDate(dateString: string) {
-    const date = new Date(dateString) || new Date();
-    const year = date.getFullYear();
-    const month = `0${date.getMonth() + 1}`.slice(-2);
-    const day = `0${date.getDate()}`.slice(-2);
-    return `${year}-${month}-${day}`;
-  }
+  const authContext = useContext(AuthContext);  
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -123,7 +116,7 @@ const EmployeeEntry: React.FC<EmployeeFormProps> = ({
       }
     }
   };
-  
+
   const fetchRoles = useCallback( async (keyword: string) => {
     if (authContext?.accessToken) {
       const response = await getRoles(authContext.accessToken, keyword, 1, 10);
