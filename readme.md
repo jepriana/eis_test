@@ -2,6 +2,10 @@
 
 This project consists of two main parts: the backend and the frontend.
 
+## Deployment
+
+The application is already deployed and can be tested using the following URL: [https://puri-bunda-web-797193089753.asia-southeast1.run.app](https://puri-bunda-web-797193089753.asia-southeast1.run.app)
+
 ## Backend
 
 The backend is developed using:

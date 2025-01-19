@@ -30,6 +30,7 @@ appModules(app);
 
 app.use('/doc', swaggerUi.serve, swaggerUi.setup(swaggerFile))
 
-const PORT = process.env.PORT || 8080
+const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 8080;
+const HOSTNAME = process.env.HOSTNAME || '0.0.0.0';
 
-app.listen(PORT, () => console.log(`Server is running on port ${PORT}`))
+app.listen(PORT, HOSTNAME, () => console.log(`Server is running on http://${HOSTNAME}:${PORT}`))
