@@ -1,9 +1,27 @@
-import React, { useState, useContext, useEffect } from 'react';
-import { Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, Autocomplete, Grid, CircularProgress } from '@mui/material';
-import { AuthContext } from '../../context/AuthContext';
-import { createEmployee, updateEmployee } from '../../services/employee_api';
-import { createUnit, getUnits, getAllUnits } from '../../services/unit_api';
-import { createRole, getRoles, getAllRoles } from '../../services/role_api';
+import React, { useState, useContext, useEffect, useCallback } from "react";
+import {
+  Button,
+  TextField,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Autocomplete,
+  CircularProgress,
+  IconButton,
+  Box,
+  Stack,
+} from "@mui/material";
+import { Delete as DeleteIcon } from "@mui/icons-material";
+import { AuthContext } from "../../context/AuthContext";
+import { createEmployee, updateEmployee } from "../../services/employee_api";
+import { createUnit, getUnits } from "../../services/unit_api";
+import { createRole, getRoles } from "../../services/role_api";
+import {
+  createEmployeeUnitRole,
+  updateEmployeeUnitRole,
+  deleteEmployeeUnitRole,
+} from "../../services/employee_unit_role_api";
 
 interface EmployeeFormProps {
   open: boolean;
@@ -14,8 +32,8 @@ interface EmployeeFormProps {
 
 interface UnitRole {
   id: string | null;
-  unit: Category | null,
-  role: Category | null
+  unit: Category | null;
+  role: Category | null;
 }
 
 interface Category {
@@ -24,135 +42,210 @@ interface Category {
   description: string;
 }
 
-type CategoryField = 'unit' | 'role';
+type CategoryField = "unit" | "role";
 
-const EmployeeEntry: React.FC<EmployeeFormProps> = ({ open, onClose, initialData, fetchEmployees }) => {
-  const [username, setUsername] = useState(initialData?.username || '');
-  const [fullName, setFullName] = useState(initialData?.fullName || '');
-  const [password, setPassword] = useState('');
-  const [joinAt, setJoinAt] = useState(initialData?.joinAt || '');
-  const [unitRoles, setUnitRoles] = useState<UnitRole[]>(initialData?.unitRoles || []);
-  const [roles, setRoles] = useState<Category[]>([]);
-  const [units, setUnits] = useState<Category[]>([]);
+const EmployeeEntry: React.FC<EmployeeFormProps> = ({
+  open,
+  onClose,
+  initialData,
+  fetchEmployees,
+}) => {
+  console.log(initialData);
+  const [username, setUsername] = useState(initialData?.username || "");
+  const [fullName, setFullName] = useState(initialData?.fullName || "");
+  const [password, setPassword] = useState("");
+  const [joinAt, setJoinAt] = useState(formatDate(initialData?.joinAt || ""));
+  const [unitRoles, setUnitRoles] = useState<UnitRole[]>(
+    initialData?.unitRoles || []
+  );
   const [roleOptions, setRoleOptions] = useState<Category[]>([]);
   const [unitOptions, setUnitOptions] = useState<Category[]>([]);
-  const [roleKeyword, setRoleKeyword] = useState('');
-  const [unitKeyword, setUnitKeyword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   const authContext = useContext(AuthContext);
+
+  function formatDate(dateString: string) {
+    const date = new Date(dateString) || new Date();
+    const year = date.getFullYear();
+    const month = `0${date.getMonth() + 1}`.slice(-2);
+    const day = `0${date.getDate()}`.slice(-2);
+    return `${year}-${month}-${day}`;
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (authContext?.accessToken) {
       const employeeData = { username, fullName, password, joinAt };
-
       try {
+        let employeeId: string | null = null;
         if (initialData) {
-          await updateEmployee(authContext.accessToken, initialData.id, employeeData);
+          employeeId = initialData.id;
+          await updateEmployee(
+            authContext.accessToken,
+            initialData.id,
+            employeeData
+          );
         } else {
-          await createEmployee(authContext.accessToken, employeeData);
+          const result = await createEmployee(
+            authContext.accessToken,
+            employeeData
+          );
+          employeeId = result.data.id;
         }
+
+        await Promise.all(
+          unitRoles.map(async (unitRole) => {
+            if (unitRole.id === null) {
+              await createEmployeeUnitRole(authContext!.accessToken!, {
+                employeeId,
+                unitId: unitRole.unit?.id,
+                roleId: unitRole.role?.id,
+              });
+            } else {
+              await updateEmployeeUnitRole(
+                authContext!.accessToken!,
+                unitRole.id,
+                {
+                  employeeId,
+                  unitId: unitRole.unit?.id,
+                  roleId: unitRole.role?.id,
+                }
+              );
+            }
+          })
+        );
+
         fetchEmployees();
         onClose();
       } catch (error) {
-        console.error('Error saving employee:', error);
+        console.error("Error saving employee:", error);
       }
     }
   };
+  
+  const fetchRoles = useCallback( async (keyword: string) => {
+    if (authContext?.accessToken) {
+      const response = await getRoles(authContext.accessToken, keyword, 1, 10);
+      setRoleOptions(response.data.data);
+    }
+  }, [authContext?.accessToken]);
 
-  const fetchInitialData = async () => {
+  const fetchUnits = useCallback( async (keyword: string) => {
+    if (authContext?.accessToken) {
+      const response = await getUnits(authContext.accessToken, keyword, 1, 10);
+      setUnitOptions(response.data.data);
+    }
+  }, [authContext?.accessToken]);
+
+  const fetchInitialData = useCallback(async () => {
     if (authContext?.accessToken) {
       setIsLoading(true);
       try {
-        const allRoles = await getAllRoles(authContext.accessToken, '');
-        const allUnits = await getAllUnits(authContext.accessToken, '');
-
-        setRoles(allRoles.data.data);
-        setUnits(allUnits.data.data);
+        await fetchUnits("");
+        await fetchRoles("");
       } catch (error) {
-        console.error('Error fetching initial data:', error);
+        console.error("Error fetching initial data:", error);
       } finally {
         setIsLoading(false);
       }
     }
-  }
+  }, [authContext?.accessToken, fetchRoles, fetchUnits]);
 
-  const fetchRoles = async (token: string, keyword: string) => { 
-    const response = await getRoles(token, keyword, 1, 10); 
-    setRoles(response.data.data); 
-  }; 
-  
-  const fetchUnits = async (token: string, keyword: string) => { 
-    const response = await getUnits(token, keyword, 1, 10); 
-    setUnits(response.data.data); 
+  const handleAddUnitRole = async () => {
+    setUnitRoles([...unitRoles, { id: null, unit: null, role: null }]);
+    await fetchUnits("");
+    await fetchRoles("");
   };
 
-  const handleAddUnitRole = () => { 
-    setUnitRoles([...unitRoles, { id: null, unit: null, role: null }]); 
-  }; 
-  
-  const handleDeleteRole = (index: number) => { 
-    setUnitRoles(unitRoles.filter((_, i) => i !== index)); 
+  const handleDeleteUnitRole = (index: number) => {
+    const unitRole = unitRoles[index];
+    setUnitRoles((prevUnitRoles) => {
+      const updatedUnitRoles = prevUnitRoles.filter((_, i) => i !== index);
+      console.log(unitRole);
+      if (authContext?.accessToken && unitRole.id) {
+        deleteEmployeeUnitRole(authContext.accessToken, unitRole.id);
+      }
+      return updatedUnitRoles;
+    });
   };
 
-  const handleChange = (index: number, field: CategoryField, value: string) => { 
-    const newUnitRoles = [...unitRoles]; 
-    let newValue: Category | null;
-    if (field === 'unit') {
-      newValue = units.find((unit) => unit.id === value) || null;
-    } else {
-      newValue = roles.find((role) => role.id === value) || null;
+  const handleChange = (
+    index: number,
+    field: CategoryField,
+    value: Category | null
+  ) => {
+    const newUnitRoles = [...unitRoles];
+    newUnitRoles[index] = { ...newUnitRoles[index], [field]: value };
+    setUnitRoles(newUnitRoles);
+  };
+
+  const handleAddNewRole = async (roleName: string) => {
+    if (authContext?.accessToken) {
+      const response = await createRole(authContext.accessToken, {
+        name: roleName,
+        description: "",
+      });
+      const newRole = response.data;
+      setRoleOptions([...roleOptions, newRole]);
+      return newRole;
     }
-    newUnitRoles[index] = { ...newUnitRoles[index], [field]: newValue };
-    setUnitRoles(newUnitRoles); 
+    return null;
   };
 
-  const handleUnitSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setUnitKeyword(e.target.value);
-  }
-
-  const handleRoleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setRoleKeyword(e.target.value);
-  }
-
-  const handleAddNewRole = async () => {
-    const roleName = prompt('Enter new role name:');
-    if (roleName) {
-      const response = await createRole(authContext!.accessToken!, { name: roleName });
-      setRoleOptions([...roleOptions, response.data]);
+  const handleAddNewUnit = async (unitName: string) => {
+    if (authContext?.accessToken) {
+      const response = await createUnit(authContext.accessToken, {
+        name: unitName,
+        description: "",
+      });
+      const newUnit = response.data;
+      setUnitOptions([...unitOptions, newUnit]);
+      return newUnit;
     }
-  };
-
-  const handleAddNewUnit = async () => {
-    const unitName = prompt('Enter new unit name:');
-    if (unitName) {
-      const response = await createUnit(authContext!.accessToken!, { name: unitName });
-      setUnitOptions([...unitOptions, response.data]);
-    }
+    return null;
   };
 
   useEffect(() => {
-    if (authContext?.accessToken) {      
-      fetchUnits(authContext.accessToken, unitKeyword);
-      fetchRoles(authContext.accessToken, roleKeyword);
-      fetchInitialData();
-    }
-    if (initialData) {
-      setUsername(initialData.username);
-      setFullName(initialData.fullName);
-      setJoinAt(initialData.joinAt);
-      setUnitRoles(initialData.unitRoles);
-    }
-  }, [authContext?.accessToken, initialData, unitKeyword, roleKeyword]);
+    setUsername(initialData?.username || "");
+    setFullName(initialData?.fullName || "");
+    setPassword("");
+    setJoinAt(formatDate(initialData?.joinAt || ""));
+    setUnitRoles(initialData?.unitRoles || []);
+    fetchInitialData();
+  }, [authContext?.accessToken, initialData, fetchInitialData]);
 
   if (isLoading) {
-     return <CircularProgress />;
+    return (
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight="100vh"
+      >
+        {" "}
+        <CircularProgress />{" "}
+      </Box>
+    );
   }
-  return  (
+
+  const getDropdownOptionsWithAddNew = (
+    options: Category[] = [],
+    inputValue: string
+  ) => {
+    const filteredOptions = options.filter((option) =>
+      option.name.toLowerCase().includes(inputValue.toLowerCase())
+    );
+    return filteredOptions.length > 0
+      ? filteredOptions
+      : [{ id: "add-new", name: `Add new ${inputValue}`, description: "" }];
+  };
+
+  return (
     <Dialog open={open} onClose={onClose}>
-      <DialogTitle>{initialData ? 'Edit Employee' : 'Add Employee'}</DialogTitle>
+      <DialogTitle>
+        {initialData ? "Edit Employee" : "Add Employee"}
+      </DialogTitle>
       <DialogContent>
         <form onSubmit={handleSubmit}>
           <TextField
@@ -194,58 +287,97 @@ const EmployeeEntry: React.FC<EmployeeFormProps> = ({ open, onClose, initialData
             InputLabelProps={{ shrink: true }}
             required
           />
-        {unitRoles.map((unitRole, index) => (
-            <Grid container spacing={2} key={index}>
-              <Grid item xs={6}>
-              <Autocomplete
-                options={unitOptions}
-                getOptionLabel={(option) => option.name}
-                value={unitOptions.find((u) => u.id === unitRole.unit?.id) || null}
-                onChange={(e, newValue) => handleChange(index, 'unit', newValue?.id || '')}
-                onInputChange={(e) => handleUnitSearch}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label="Unit"
-                    fullWidth
-                    margin="normal"
-                    variant="outlined"
-                  />
-                )}
-              />
-              </Grid>
-              <Grid item xs={5}>
-              <Autocomplete
-                options={roleOptions}
-                getOptionLabel={(option) => option.name}
-                value={roleOptions.find((u) => u.id === unitRole.role?.id) || null}
-                onChange={(e, newValue) => handleChange(index, 'role', newValue?.id || '')}
-                onInputChange={(e) =>handleRoleSearch }
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label="Role"
-                    fullWidth
-                    margin="normal"
-                    variant="outlined"
-                  />
-                )}
-              />
-              </Grid>
-              <Button onClick={() => handleDeleteRole(index)} color="secondary">
-                Delete Unit Role
-              </Button>
-            </Grid>
+          {unitRoles.map((unitRole, index) => (
+            <Stack
+              direction="row"
+              spacing={2}
+              key={index}
+              alignItems={"center"}
+              width={"100%"}
+            >
+              <Box flexGrow={1}>
+                <Autocomplete
+                  options={getDropdownOptionsWithAddNew(
+                    unitOptions,
+                    unitRole.unit?.name || ""
+                  )}
+                  getOptionLabel={(option) => option.name}
+                  value={unitRole.unit}
+                  onChange={async (e, newValue) => {
+                    if (newValue?.id === "add-new") {
+                      const newUnit = await handleAddNewUnit(
+                        newValue.name.replace("Add new ", "")
+                      );
+                      if (newUnit) handleChange(index, "unit", newUnit);
+                    } else {
+                      handleChange(index, "unit", newValue);
+                    }
+                  }}
+                  onInputChange={(e, newInputValue) =>
+                    fetchUnits(newInputValue)
+                  }
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Unit"
+                      fullWidth
+                      margin="normal"
+                      variant="outlined"
+                    />
+                  )}
+                />
+              </Box>
+              <Box flexGrow={1}>
+                <Autocomplete
+                  options={getDropdownOptionsWithAddNew(
+                    roleOptions,
+                    unitRole.role?.name || ""
+                  )}
+                  getOptionLabel={(option) => option.name}
+                  value={unitRole.role}
+                  onChange={async (e, newValue) => {
+                    if (newValue?.id === "add-new") {
+                      const newRole = await handleAddNewRole(
+                        newValue.name.replace("Add new ", "")
+                      );
+                      if (newRole) handleChange(index, "role", newRole);
+                    } else {
+                      handleChange(index, "role", newValue);
+                    }
+                  }}
+                  onInputChange={(e, newInputValue) =>
+                    fetchRoles(newInputValue)
+                  }
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Role"
+                      fullWidth
+                      margin="normal"
+                      variant="outlined"
+                    />
+                  )}
+                />
+              </Box>
+              <Box>
+                <IconButton
+                  onClick={() => handleDeleteUnitRole(index)}
+                  color="secondary"
+                >
+                  <DeleteIcon />
+                </IconButton>
+              </Box>
+            </Stack>
           ))}
           <Button onClick={handleAddUnitRole} color="primary">
-            Add Role
+            Add Unit & Role
           </Button>
           <DialogActions>
             <Button onClick={onClose} color="secondary">
               Cancel
             </Button>
             <Button type="submit" variant="contained" color="primary">
-              {initialData ? 'Update' : 'Add'}
+              {initialData ? "Update" : "Add"}
             </Button>
           </DialogActions>
         </form>
