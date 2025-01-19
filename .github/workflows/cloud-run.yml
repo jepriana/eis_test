@@ -22,7 +22,7 @@ jobs:
 
     - name: Generate .env file for backend
       run: |
-        echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> backend/.env
+        echo 'DATABASE_URL="${{ secrets.DATABASE_URL }}"' >> backend/.env
         echo "ACCESS_TOKEN_KEY=${{ secrets.ACCESS_TOKEN_KEY }}" >> backend/.env 
         echo "REFRESH_TOKEN_KEY=${{ secrets.REFRESH_TOKEN_KEY }}" >> backend/.env 
         echo "ACCESS_TOKEN_AGE=${{ secrets.ACCESS_TOKEN_AGE }}" >> backend/.env 
