@@ -141,42 +141,36 @@ const EmployeeEntry: React.FC<EmployeeFormProps> = ({
   const fetchRoles = async (keyword: string) => {
     if (authContext?.accessToken) {
       const response = await getRoles(authContext.accessToken, keyword, 1, 10);
-      if (response.data && response.data.data.length > 0) {
-        setRoleOptions(response.data.data);
-      } else {
-        setRoleOptions([
-          { id: "add-new", name: `Add new ${keyword}`, description: "" },
-        ]);
-      }
+      setRoleOptions(response.data.data);
     }
   };
 
   const fetchUnits = async (keyword: string) => {
     if (authContext?.accessToken) {
       const response = await getUnits(authContext.accessToken, keyword, 1, 10);
-
-      if (response.data && response.data.data.length > 0) {
-        setUnitOptions(response.data.data);
-      } else {
-        setUnitOptions([
-          { id: "add-new", name: `Add new ${keyword}`, description: "" },
-        ]);
-      }
+      setUnitOptions(response.data.data);
     }
   };
 
-  const handleAddUnitRole = () => {
+  const handleAddUnitRole = async () => {
     setUnitRoles([...unitRoles, { id: null, unit: null, role: null }]);
+    await fetchUnits("");
+    await fetchRoles("");
   };
 
-  const handleDeleteRole = async (index: number) => {
-    if (authContext?.accessToken && unitRoles[index].id) {
-      await deleteEmployeeUnitRole(
-        authContext.accessToken,
-        unitRoles[index].id!
-      );
-    }
-    setUnitRoles(unitRoles.filter((_, i) => i !== index));
+  const handleDeleteUnitRole =  (index: number) => {
+    const unitRole = unitRoles[index];
+    setUnitRoles(prevUnitRoles => {
+      const updatedUnitRoles = prevUnitRoles.filter((_, i) => i !== index);
+      console.log(unitRole);
+      if (authContext?.accessToken && unitRole.id) {
+        deleteEmployeeUnitRole(
+          authContext.accessToken,
+          unitRole.id
+        );
+      }
+      return updatedUnitRoles;
+    });
   };
 
   const handleChange = (
@@ -238,6 +232,20 @@ const EmployeeEntry: React.FC<EmployeeFormProps> = ({
     );
   }
 
+  const getDropdownOptionsWithAddNew = (
+    options: Category[] = [],
+    inputValue: string
+  ) => {
+    const filteredOptions = options.filter(
+      (option) => option.name.toLowerCase().includes(inputValue.toLowerCase())
+    );
+    return filteredOptions.length > 0
+      ? filteredOptions
+      : [
+          { id: "add-new", name: `Add new ${inputValue}`, description: "" },
+        ];
+  };
+
   return (
     <Dialog open={open} onClose={onClose}>
       <DialogTitle>
@@ -294,7 +302,7 @@ const EmployeeEntry: React.FC<EmployeeFormProps> = ({
             >
               <Box flexGrow={1}>
                 <Autocomplete
-                  options={unitOptions}
+                  options={getDropdownOptionsWithAddNew(unitOptions, unitRole.unit?.name || '')}
                   getOptionLabel={(option) => option.name}
                   value={unitRole.unit}
                   onChange={async (e, newValue) => {
@@ -323,7 +331,7 @@ const EmployeeEntry: React.FC<EmployeeFormProps> = ({
               </Box>
               <Box flexGrow={1}>
                 <Autocomplete
-                  options={roleOptions}
+                  options={getDropdownOptionsWithAddNew(roleOptions, unitRole.role?.name || '')}
                   getOptionLabel={(option) => option.name}
                   value={unitRole.role}
                   onChange={async (e, newValue) => {
@@ -352,7 +360,7 @@ const EmployeeEntry: React.FC<EmployeeFormProps> = ({
               </Box>
               <Box>
                 <IconButton
-                  onClick={() => handleDeleteRole(index)}
+                  onClick={() => handleDeleteUnitRole(index)}
                   color="secondary"
                 >
                   <DeleteIcon />

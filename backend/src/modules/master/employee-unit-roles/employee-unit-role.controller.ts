@@ -88,12 +88,12 @@ export async function getAllEmployeeUnitRoleWithPaginations(req: Request, res: R
 
 export async function getEmployeeUnitRoleById(req: Request, res: Response) {
     try {
-        const { employeeUniRoleId } = req.params;
-        const result: EmployeeUnitRole | null = await repository.getEmployeeUnitRoleById(employeeUniRoleId.toString());
+        const { employeeUnitRoleId } = req.params;
+        const result: EmployeeUnitRole | null = await repository.getEmployeeUnitRoleById(employeeUnitRoleId.toString());
         if (result) {
             return okResponse(res, result);
         }
-        return notFoundErrorResponse(res, `No unit role with ID ${employeeUniRoleId} found`);
+        return notFoundErrorResponse(res, `No unit role with ID ${employeeUnitRoleId} found`);
     } catch {
         return internalErrorResponse(
             res,
@@ -104,8 +104,8 @@ export async function getEmployeeUnitRoleById(req: Request, res: Response) {
 
 export async function updateEmployeeUnitRole(req: Request, res: Response) {
     try {
-        const { employeeUniRoleId } = req.params;
-        const result: EmployeeUnitRole | null = await repository.getEmployeeUnitRoleById(employeeUniRoleId.toString());
+        const { employeeUnitRoleId } = req.params;
+        const result: EmployeeUnitRole | null = await repository.getEmployeeUnitRoleById(employeeUnitRoleId.toString());
         if (result) {
             const {
                 employeeId,
@@ -129,7 +129,7 @@ export async function updateEmployeeUnitRole(req: Request, res: Response) {
                 unitId,
             };
 
-            const updatedemployeeUnitRole = await repository.updateEmployeeUnitRole(employeeUniRoleId,updateemployeeUnitRole);
+            const updatedemployeeUnitRole = await repository.updateEmployeeUnitRole(employeeUnitRoleId,updateemployeeUnitRole);
 
             if (updatedemployeeUnitRole) {
                 return noContentResponse(res, 'Unit role was updated successfully');
@@ -137,7 +137,8 @@ export async function updateEmployeeUnitRole(req: Request, res: Response) {
             return internalErrorResponse(res, 'Some error occured while updating unit role.');
         }
         return notFoundErrorResponse(res, 'No unit role data found');
-    } catch {
+    } catch (e){
+        console.log('Some error occured while updating unit role.\n', e);
         return internalErrorResponse(
             res,
             'Some error occured while updating unit role.',
@@ -147,16 +148,16 @@ export async function updateEmployeeUnitRole(req: Request, res: Response) {
 
 export async function deleteEmployeeUnitRole(req: Request, res: Response) {
     try {
-        const { employeeUniRoleId } = req.params;
-        const result: EmployeeUnitRole | null = await repository.getEmployeeUnitRoleById(employeeUniRoleId.toString());
+        const { employeeUnitRoleId } = req.params;
+        const result: EmployeeUnitRole | null = await repository.getEmployeeUnitRoleById(employeeUnitRoleId.toString());
         if (result) {
-            const deletedemployeeUnitRole = await repository.deleteEmployeeUnitRole(employeeUniRoleId);
+            const deletedemployeeUnitRole = await repository.deleteEmployeeUnitRole(employeeUnitRoleId);
             if (deletedemployeeUnitRole) {
                 return noContentResponse(res, 'Unit role was deleted successfully');
             }
             return internalErrorResponse(res, 'Some error occured while creating unit role.');
         }
-        return notFoundErrorResponse(res, `Cannot delete unit role with ID ${employeeUniRoleId}. Unit role was not found.`);
+        return notFoundErrorResponse(res, `Cannot delete unit role with ID ${employeeUnitRoleId}. Unit role was not found.`);
     } catch {
         return internalErrorResponse(
             res,
