@@ -41,7 +41,7 @@ const AppContent: React.FC = () => {
   };
   if (authContext?.loading) { return <CircularProgress />; }
     
-  if (!authContext?.accessToken && location.pathname !== '/login') {
+  if ((!authContext?.accessToken || authContext?.isAccessTokenExpired()) && location.pathname !== '/login') {
     return <Navigate to="/login" />;
   }
 
