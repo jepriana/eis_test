@@ -67,23 +67,23 @@ const seed = async () => {
     )
   );
 
-  // // Generate auth logs
+  // Generate auth logs
   // const employees = await getAllEmployees('');
-  // await Promise.all(
-  //   Array.from({ length: 200 }).map(() =>
-  //     prisma.authLog.create({
-  //       data: {
-  //         employeeId: employees[Math.floor(Math.random() * employees.length)].id,
-  //         transaction: 'Login',
-  //         isSucceed: true,
-  //         authAt: faker.date.between({
-  //           from: subMonths(new Date(), 1),
-  //           to: new Date(),
-  //         }),
-  //       },
-  //     })
-  //   )
-  // );
+  await Promise.all(
+    Array.from({ length: 200 }).map(() =>
+      prisma.authLog.create({
+        data: {
+          employeeId: employees[Math.floor(Math.random() * employees.length)].id,
+          transaction: 'Login',
+          isSucceed: true,
+          authAt: faker.date.between({
+            from: subMonths(new Date(), 1),
+            to: new Date(),
+          }),
+        },
+      })
+    )
+  );
 
   // Create admin user
   await prisma.employee.create({
