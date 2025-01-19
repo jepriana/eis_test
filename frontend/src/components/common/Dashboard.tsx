@@ -25,10 +25,11 @@ interface DashboardData {
 }
 
 const Dashboard: React.FC = () => {
+    const currentDate = dayjs();
     const [data, setData] = useState<DashboardData | null>(null);
     const [loading, setLoading] = useState(true);
-    const [startDate, setStartDate] = useState<Dayjs>(dayjs(`${dayjs().year()}-01-01`));
-    const [endDate, setEndDate] = useState<Dayjs>(dayjs());
+    const [startDate, setStartDate] = useState<Dayjs>(currentDate.subtract(1, 'year'));
+    const [endDate, setEndDate] = useState<Dayjs>(currentDate);
     const authContext = useContext(AuthContext);
 
     const fetchData = useCallback( async (start: string, end: string) => {
@@ -143,7 +144,7 @@ const Dashboard: React.FC = () => {
                 </Card>
             </Box>
             <Typography variant="h5" gutterBottom>
-                Top 10 Employees by Login
+                Top 10 Employees by Logins Above 25
             </Typography>
             <Box sx={{ mb: 4 }}>
                 <Bar data={barData} />
