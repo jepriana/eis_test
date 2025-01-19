@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useContext, useEffect, useCallback } from "react";
 import {
   Button,
   TextField,
@@ -123,8 +123,22 @@ const EmployeeEntry: React.FC<EmployeeFormProps> = ({
       }
     }
   };
+  
+  const fetchRoles = useCallback( async (keyword: string) => {
+    if (authContext?.accessToken) {
+      const response = await getRoles(authContext.accessToken, keyword, 1, 10);
+      setRoleOptions(response.data.data);
+    }
+  }, [authContext?.accessToken]);
 
-  const fetchInitialData = async () => {
+  const fetchUnits = useCallback( async (keyword: string) => {
+    if (authContext?.accessToken) {
+      const response = await getUnits(authContext.accessToken, keyword, 1, 10);
+      setUnitOptions(response.data.data);
+    }
+  }, [authContext?.accessToken]);
+
+  const fetchInitialData = useCallback(async () => {
     if (authContext?.accessToken) {
       setIsLoading(true);
       try {
@@ -136,21 +150,7 @@ const EmployeeEntry: React.FC<EmployeeFormProps> = ({
         setIsLoading(false);
       }
     }
-  };
-
-  const fetchRoles = async (keyword: string) => {
-    if (authContext?.accessToken) {
-      const response = await getRoles(authContext.accessToken, keyword, 1, 10);
-      setRoleOptions(response.data.data);
-    }
-  };
-
-  const fetchUnits = async (keyword: string) => {
-    if (authContext?.accessToken) {
-      const response = await getUnits(authContext.accessToken, keyword, 1, 10);
-      setUnitOptions(response.data.data);
-    }
-  };
+  }, [authContext?.accessToken, fetchRoles, fetchUnits]);
 
   const handleAddUnitRole = async () => {
     setUnitRoles([...unitRoles, { id: null, unit: null, role: null }]);
@@ -158,16 +158,13 @@ const EmployeeEntry: React.FC<EmployeeFormProps> = ({
     await fetchRoles("");
   };
 
-  const handleDeleteUnitRole =  (index: number) => {
+  const handleDeleteUnitRole = (index: number) => {
     const unitRole = unitRoles[index];
-    setUnitRoles(prevUnitRoles => {
+    setUnitRoles((prevUnitRoles) => {
       const updatedUnitRoles = prevUnitRoles.filter((_, i) => i !== index);
       console.log(unitRole);
       if (authContext?.accessToken && unitRole.id) {
-        deleteEmployeeUnitRole(
-          authContext.accessToken,
-          unitRole.id
-        );
+        deleteEmployeeUnitRole(authContext.accessToken, unitRole.id);
       }
       return updatedUnitRoles;
     });
@@ -216,7 +213,7 @@ const EmployeeEntry: React.FC<EmployeeFormProps> = ({
     setJoinAt(formatDate(initialData?.joinAt || ""));
     setUnitRoles(initialData?.unitRoles || []);
     fetchInitialData();
-  }, [authContext?.accessToken, initialData]);
+  }, [authContext?.accessToken, initialData, fetchInitialData]);
 
   if (isLoading) {
     return (
@@ -236,14 +233,12 @@ const EmployeeEntry: React.FC<EmployeeFormProps> = ({
     options: Category[] = [],
     inputValue: string
   ) => {
-    const filteredOptions = options.filter(
-      (option) => option.name.toLowerCase().includes(inputValue.toLowerCase())
+    const filteredOptions = options.filter((option) =>
+      option.name.toLowerCase().includes(inputValue.toLowerCase())
     );
     return filteredOptions.length > 0
       ? filteredOptions
-      : [
-          { id: "add-new", name: `Add new ${inputValue}`, description: "" },
-        ];
+      : [{ id: "add-new", name: `Add new ${inputValue}`, description: "" }];
   };
 
   return (
@@ -302,7 +297,10 @@ const EmployeeEntry: React.FC<EmployeeFormProps> = ({
             >
               <Box flexGrow={1}>
                 <Autocomplete
-                  options={getDropdownOptionsWithAddNew(unitOptions, unitRole.unit?.name || '')}
+                  options={getDropdownOptionsWithAddNew(
+                    unitOptions,
+                    unitRole.unit?.name || ""
+                  )}
                   getOptionLabel={(option) => option.name}
                   value={unitRole.unit}
                   onChange={async (e, newValue) => {
@@ -331,7 +329,10 @@ const EmployeeEntry: React.FC<EmployeeFormProps> = ({
               </Box>
               <Box flexGrow={1}>
                 <Autocomplete
-                  options={getDropdownOptionsWithAddNew(roleOptions, unitRole.role?.name || '')}
+                  options={getDropdownOptionsWithAddNew(
+                    roleOptions,
+                    unitRole.role?.name || ""
+                  )}
                   getOptionLabel={(option) => option.name}
                   value={unitRole.role}
                   onChange={async (e, newValue) => {
