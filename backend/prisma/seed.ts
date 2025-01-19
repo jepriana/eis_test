@@ -82,6 +82,17 @@ const seed = async () => {
     )
   );
 
+  // Create admin user
+  await prisma.employee.create({
+    data: {
+      username: 'admin',
+      fullName: 'Admin User',
+      password: bcrypt.hashSync('Rahasia@123', 8),
+      isAdmin: true,
+      joinAt: new Date(),
+    },
+  });
+
   console.log('Seeding finished.');
 };
 

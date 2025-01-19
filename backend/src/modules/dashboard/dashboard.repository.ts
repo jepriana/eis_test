@@ -43,6 +43,13 @@ export async function getDashboardSummary(startDate: Date, endDate: Date): Promi
                 employeeId: 'desc',
             },
         },
+        having: {
+            employeeId: {
+                _count: {
+                    gt: 25,
+                }
+            }
+        },
         take: 10,
     });
 

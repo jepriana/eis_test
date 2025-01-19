@@ -50,7 +50,12 @@ The backend is developed using:
     npx prisma generate
     ```
 
-6. **Start the backend server:**
+6. **Create dummy data:**
+    ```sh
+    npm run seed
+    ```
+
+7. **Start the backend server:**
     ```sh
     npm run dev
     ```
@@ -84,7 +89,11 @@ The frontend is developed using:
     ```sh
     npm start
     ```
-
+5. **Login with initial admin user:**
+    ```sh
+    username: admin
+    password: Rahasia@123
+    ```
 ## Running the Project
 
 1. Start the backend server.

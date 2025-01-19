@@ -29,7 +29,7 @@ CREATE TABLE "Unit" (
 );
 
 -- CreateTable
-CREATE TABLE "Posision" (
+CREATE TABLE "Role" (
     "id" UUID NOT NULL DEFAULT gen_random_uuid(),
     "name" TEXT NOT NULL,
     "description" TEXT,
@@ -37,26 +37,26 @@ CREATE TABLE "Posision" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    CONSTRAINT "Posision_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "Role_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
-CREATE TABLE "EmployeeUnitPosition" (
+CREATE TABLE "EmployeeUnitRole" (
     "id" UUID NOT NULL DEFAULT gen_random_uuid(),
-    "employeeId" UUID,
-    "unitId" UUID,
-    "positionId" UUID,
+    "employeeId" UUID NOT NULL,
+    "unitId" UUID NOT NULL,
+    "roleId" UUID NOT NULL,
     "isActive" BOOLEAN NOT NULL DEFAULT true,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    CONSTRAINT "EmployeeUnitPosition_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "EmployeeUnitRole_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "AuthLog" (
     "id" UUID NOT NULL DEFAULT gen_random_uuid(),
-    "employeeId" UUID,
+    "employeeId" UUID NOT NULL,
     "transaction" "TransactionType" NOT NULL,
     "isSucceed" BOOLEAN NOT NULL DEFAULT true,
     "authAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -71,28 +71,16 @@ CREATE UNIQUE INDEX "Employee_username_key" ON "Employee"("username");
 CREATE UNIQUE INDEX "Unit_name_key" ON "Unit"("name");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Posision_name_key" ON "Posision"("name");
-
--- CreateIndex
-CREATE UNIQUE INDEX "EmployeeUnitPosition_employeeId_key" ON "EmployeeUnitPosition"("employeeId");
-
--- CreateIndex
-CREATE UNIQUE INDEX "EmployeeUnitPosition_unitId_key" ON "EmployeeUnitPosition"("unitId");
-
--- CreateIndex
-CREATE UNIQUE INDEX "EmployeeUnitPosition_positionId_key" ON "EmployeeUnitPosition"("positionId");
-
--- CreateIndex
-CREATE UNIQUE INDEX "AuthLog_employeeId_key" ON "AuthLog"("employeeId");
+CREATE UNIQUE INDEX "Role_name_key" ON "Role"("name");
 
 -- AddForeignKey
-ALTER TABLE "EmployeeUnitPosition" ADD CONSTRAINT "EmployeeUnitPosition_employeeId_fkey" FOREIGN KEY ("employeeId") REFERENCES "Employee"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "EmployeeUnitRole" ADD CONSTRAINT "EmployeeUnitRole_employeeId_fkey" FOREIGN KEY ("employeeId") REFERENCES "Employee"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "EmployeeUnitPosition" ADD CONSTRAINT "EmployeeUnitPosition_unitId_fkey" FOREIGN KEY ("unitId") REFERENCES "Unit"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "EmployeeUnitRole" ADD CONSTRAINT "EmployeeUnitRole_unitId_fkey" FOREIGN KEY ("unitId") REFERENCES "Unit"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "EmployeeUnitPosition" ADD CONSTRAINT "EmployeeUnitPosition_positionId_fkey" FOREIGN KEY ("positionId") REFERENCES "Posision"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "EmployeeUnitRole" ADD CONSTRAINT "EmployeeUnitRole_roleId_fkey" FOREIGN KEY ("roleId") REFERENCES "Role"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "AuthLog" ADD CONSTRAINT "AuthLog_employeeId_fkey" FOREIGN KEY ("employeeId") REFERENCES "Employee"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "AuthLog" ADD CONSTRAINT "AuthLog_employeeId_fkey" FOREIGN KEY ("employeeId") REFERENCES "Employee"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
