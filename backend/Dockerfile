@@ -7,10 +7,10 @@ RUN npm install
 RUN npx prisma generate
 RUN npx tsc
 
-ENV PORT 8080
-# set hostname to localhost
-ENV HOSTNAME "0.0.0.0"
-
 EXPOSE 8080
 
-CMD ["node", "dist/app.js"]
+ENV PORT=8080
+# set hostname to localhost
+ENV HOSTNAME="0.0.0.0"
+
+CMD ["npm", "start"]
