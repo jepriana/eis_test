@@ -46,7 +46,17 @@ const Dashboard: React.FC = () => {
     }, [authContext?.accessToken, startDate, endDate, fetchData]);
 
     if (loading) {
-        return <CircularProgress />;
+        return (
+          <Box
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+            minHeight="100vh"
+          >
+            {" "}
+            <CircularProgress />{" "}
+          </Box>
+        );
     }
 
     const barData = {

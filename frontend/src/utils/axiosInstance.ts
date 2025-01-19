@@ -3,7 +3,7 @@ import { refreshToken } from '../services/auth_api';
 import { AuthContext } from '../context/AuthContext';
 import { useContext } from 'react';
 
-const API_URL = process.env.REACT_APP_API_URL ?? 'http://localhost:3001'; // Replace with your API URL
+const API_URL = process.env.REACT_APP_BACKEND_URL ?? 'http://localhost:3001'; // Replace with your API URL
 
 
 const axiosInstance = axios.create({

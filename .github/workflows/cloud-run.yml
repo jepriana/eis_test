@@ -1,0 +1,113 @@
+name: Deploy to Cloud Run Production
+
+on:
+  push:
+    branches:
+      - master
+      - main
+
+env:
+  CLOUD_RUN_REGION: asia-southeast1
+  # project-name but it can be anything you want
+  BACKEND_REPO_NAME: puri-bunda-api
+  FRONTEND_REPO_NAME: puri-bunda-web
+
+jobs:
+  build-and-deploy-backend:
+    name: Setup, Build, and Deploy Backend
+    runs-on: ubuntu-latest
+    steps:  
+
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Switch to backend directory and Generate .env file
+      run: |
+        cd backend
+        echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> .env
+        echo "ACCESS_TOKEN_KEY=${{ secrets.ACCESS_TOKEN_KEY }}" >> .env 
+        echo "REFRESH_TOKEN_KEY=${{ secrets.REFRESH_TOKEN_KEY }}" >> .env 
+        echo "ACCESS_TOKEN_AGE=${{ secrets.ACCESS_TOKEN_AGE }}" >> .env 
+        echo "REFRESH_TOKEN_AGE=${{ secrets.REFRESH_TOKEN_AGE }}" >> .env 
+        echo "SECRET_CODE=${{ secrets.SECRET_CODE }}" >> .env 
+ 
+    # This step is where our service account will be authenticated
+    - name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v1
+      with:
+        credentials_json: ${{ secrets.CLOUD_RUN_SERVICE_ACCOUNT_JSON }}
+
+    - name: Set up Google Cloud SDK
+      uses: google-github-actions/setup-gcloud@v1
+      with:
+        project_id:  ${{ secrets.CLOUD_RUN_PROJECT_NAME }}
+
+    - name: Enable the necessary APIs and enable docker auth
+      run: |-
+        gcloud services enable containerregistry.googleapis.com
+        gcloud services enable run.googleapis.com
+        gcloud --quiet auth configure-docker
+
+    - name: Build and tag image
+      run: |-
+        docker build . --tag "gcr.io/${{ secrets.CLOUD_RUN_PROJECT_NAME }}/$BACKEND_REPO_NAME:$GITHUB_SHA"
+
+    - name: Push image to GCR
+      run: |-
+        docker push gcr.io/${{ secrets.CLOUD_RUN_PROJECT_NAME }}/$BACKEND_REPO_NAME:$GITHUB_SHA
+
+    - name: Deploy
+      run: |-
+        gcloud run deploy $BACKEND_REPO_NAME --image gcr.io/${{ secrets.CLOUD_RUN_PROJECT_NAME }}/$BACKEND_REPO_NAME:$GITHUB_SHA \
+          --project ${{ secrets.CLOUD_RUN_PROJECT_NAME }} \
+          --platform managed \
+          --region $CLOUD_RUN_REGION \
+          --allow-unauthenticated \
+          --quiet
+    
+  build-and-deploy-frontend:
+    name: Setup, Build, and Deploy Frontend
+    runs-on: ubuntu-latest
+    steps:  
+
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Switch to frontend directory and Generate .env file
+      run: |
+        cd frontend
+        echo "REACT_APP_BACKEND_URL=${{ secrets.REACT_APP_BACKEND_URL }}" >> .env
+ 
+    # This step is where our service account will be authenticated
+    - name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v1
+      with:
+        credentials_json: ${{ secrets.CLOUD_RUN_SERVICE_ACCOUNT_JSON }}
+
+    - name: Set up Google Cloud SDK
+      uses: google-github-actions/setup-gcloud@v1
+      with:
+        project_id:  ${{ secrets.s }}
+
+    - name: Enable the necessary APIs and enable docker auth
+      run: |-
+        gcloud services enable containerregistry.googleapis.com
+        gcloud services enable run.googleapis.com
+        gcloud --quiet auth configure-docker
+
+    - name: Build and tag image
+      run: |-
+        docker build . --tag "gcr.io/${{ secrets.CLOUD_RUN_PROJECT_NAME }}/$FRONTEND_REPO_NAME:$GITHUB_SHA"
+
+    - name: Push image to GCR
+      run: |-
+        docker push gcr.io/${{ secrets.CLOUD_RUN_PROJECT_NAME }}/$FRONTEND_REPO_NAME:$GITHUB_SHA
+
+    - name: Deploy
+      run: |-
+        gcloud run deploy $FRONTEND_REPO_NAME --image gcr.io/${{ secrets.CLOUD_RUN_PROJECT_NAME }}/$FRONTEND_REPO_NAME:$GITHUB_SHA \
+          --project ${{ secrets.CLOUD_RUN_PROJECT_NAME }} \
+          --platform managed \
+          --region $CLOUD_RUN_REGION \
+          --allow-unauthenticated \
+          --quiet
