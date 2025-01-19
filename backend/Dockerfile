@@ -9,8 +9,8 @@ RUN npx tsc
 
 EXPOSE 8080
 
-ENV PORT 8080
+ENV PORT=8080
 # set hostname to localhost
-ENV HOSTNAME "0.0.0.0"
+ENV HOSTNAME="0.0.0.0"
 
-CMD ["npm", "start"]
+CMD ["node", "dist/app.js"]
